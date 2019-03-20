@@ -72,7 +72,10 @@ void JackknifeAnalyzer<K, T>::jackknife(const K& Xkey, T& mu_X, T& sigma_X) {
 	sigma_X = sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma_X);
 }
 
-
+template<typename K, typename T>
+std::vector<T> JackknifeAnalyzer<K, T>::samples(const K& Xkey) {
+	return Xs_reduced_samples.at(Xkey);
+}
 
 // ************************************** private **************************************
 

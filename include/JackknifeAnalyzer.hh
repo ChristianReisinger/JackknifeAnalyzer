@@ -56,6 +56,11 @@ public:
 	 */
 	void jackknife(const K& Xkey, T& mu_X, T& sigma_X);
 
+	/**
+	 * Returns a copy of the jackknife samples of the variable with key Xkey.
+	 */
+	std::vector<T> samples(const K& Xkey);
+
 private:
 
 	int N_samples;
