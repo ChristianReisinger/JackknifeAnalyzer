@@ -49,6 +49,25 @@ void JackknifeAnalyzer<K, T>::resample(const K& Xkey, const std::vector<T>& Xsam
 }
 
 template<typename K, typename T>
+void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, std::function<T(std::vector<T>)> F, const std::vector<K> Xkeys) {
+	if(Xs_reduced_samples.count(Fkey) == 0 && Xs_mu.count(Fkey) == 0) {
+		std::vector<T> args_mu;
+		for(K key : Xkeys)
+			args_mu.push_back(Xs_mu.at(key));
+		Xs_mu[Fkey] = F(args_mu);
+
+		std::vector<T> F_jackknife_samples;
+		for(int i = 0; i < N_samples; ++i) {
+			std::vector<T> args_red_samples;
+			for(K key : Xkeys)
+				args_red_samples.push_back(Xs_reduced_samples.at(key)[i]);
+			F_jackknife_samples.push_back(F(args_red_samples));
+		}
+		Xs_reduced_samples[Fkey] = F_jackknife_samples;
+	}
+}
+
+template<typename K, typename T>
 template<typename ... Ks, typename ... Ts>
 void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, T (*F)(Ts...), const Ks& ... F_arg_keys) {
 	static_assert(and_type<std::is_convertible<Ks, K>::value ...>::value , "JackknifeAnalyzer::add_function invalid key type");
@@ -62,6 +81,19 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, T (*F)(Ts...), const K
 			F_jackknife_samples.push_back(F(Xs_reduced_samples.at(F_arg_keys)[i]...));
 		Xs_reduced_samples[Fkey] = F_jackknife_samples;
 	}
+}
+
+template<typename K, typename T>
+double JackknifeAnalyzer<K, T>::mu(const K& Xkey) {
+	return Xs_mu.at(Xkey);
+}
+
+template<typename K, typename T>
+double JackknifeAnalyzer<K, T>::sigma(const K& Xkey) {
+	double sigma = 0.0;
+	for(T d : Xs_reduced_samples.at(Xkey))
+		sigma += pow(d - Xs_mu.at(Xkey), (T) 2);
+	return sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma);
 }
 
 template<typename K, typename T>
