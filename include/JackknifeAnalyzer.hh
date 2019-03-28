@@ -10,7 +10,6 @@
 
 #include <map>
 #include <vector>
-#include <functional>
 
 template<typename K, typename T>
 class JackknifeAnalyzer {
@@ -20,7 +19,7 @@ public:
 	 * Create an empty JackknifeAnalyzer with no datasets. Data is stored with arithmetic type T.
 	 * Jackknife-resampled datasets can be added directly or computed from non-resampled datasets or a function.
 	 * Jackknife samples and means are stored internally using keys of type K.
-	 * Mean and jackknife error of a stored variable can be computed by calling jackknife(...) with according key.
+	 * Mean and jackknife error of a stored variable can be computed by calling jackknife(...), mu(...), sigma(...) with according key.
 	 */
 	JackknifeAnalyzer();
 
@@ -46,25 +45,38 @@ public:
 	void resample(const K& Xkey, const std::vector<T>& Xsamples);
 
 	/**
-	 * Computes and stores jackknife samples and mean of a variable F which is a function taking a vector of variables
-	 * with keys in Xkeys.
+	 * Computes and stores jackknife samples and mean of a variable F which is a function taking a vector of data type T
+	 * of variables with keys in F_arg_keys.
 	 * Does nothing if key Fkey already exists.
-	 * Throws if Fkey and one or more keys in Xkeys do not exist.
+	 * Throws if Fkey and one or more keys in F_arg_keys do not exist.
 	 *
-	 * This is a more versatile version of add_function(const K&, T (*)(Ts ...), const Ks& ...), which allows
-	 * use of variables outside the JackknifeAnalyzer via the state of a std::function object and/or an at
-	 * compile-time unknown number of variables.
+	 * This version of add_function can be used if the number of arguments of F is unknown at compile time, but
+	 * requires vector input for the keys and function arguments.
 	 */
-	void add_function(const K& Fkey, std::function<T(std::vector<T>)> F, const std::vector<K> Xkeys);
+	template<typename Function>
+	void add_function(const K& Fkey, Function F, const std::vector<K>& F_arg_keys);
 
 	/**
-	 * Computes and stores jackknife samples and mean of a variable F, which is a function of variables with keys Xkeys,
-	 * under the key Fkey.
+	 * Computes and stores jackknife samples and mean of a variable F, which is a function of variables of data type T
+	 * with keys F_arg_keys, under the key Fkey.
 	 * Does nothing if key Fkey already exists.
-	 * Throws if Fkey and one or more keys Xkeys do not exist.
+	 * Throws if Fkey and one or more keys F_arg_keys do not exist.
+	 *
+	 * Accepts a function F taking any number of arguments of data type T, which requires knowing the number of arguments at compile time.
 	 */
-	template<typename ... Ks, typename ... Ts>
-	void add_function(const K& Fkey, T (*F)(Ts ...), const Ks& ... Xkeys);
+	template<typename Function, typename ... Ks>
+	void add_function(const K& Fkey, Function F, const Ks& ... F_arg_keys);
+
+	/**
+	 * Removes the variable with key Xkey from the JackknifeAnalyzer.
+	 * Does nothing if Xkey does not exist.
+	 */
+	void remove(const K& Xkey);
+
+	/**
+	 * Returns a vector of keys of all variables in the JackknifeAnalyzer.
+	 */
+	std::vector<K> keys();
 
 	/**
 	 * Returns the mean of the variable with key Xkey.
