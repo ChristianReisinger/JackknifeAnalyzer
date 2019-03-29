@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 #include <utility>
-#include <exception>
+#include <stdexcept>
 #include <cmath>
 #include <type_traits>
 #include <functional>
