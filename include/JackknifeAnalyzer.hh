@@ -80,7 +80,7 @@ public:
 
 	/**
 	 * Returns the mean of the variable with key Xkey.
-	 * Throw if Xkey does not exist.
+	 * Throws if Xkey does not exist.
 	 */
 	double mu(const K& Xkey);
 
@@ -91,13 +91,14 @@ public:
 	double sigma(const K& Xkey);
 
 	/**
-	 * If a key Xkey does not exist, does nothing and return false, otherwise
+	 * If a key Xkey does not exist, does nothing and returns false, otherwise
 	 * assigns the mean / jackknife error of the variable with key Xkey to mu_X / sigma_X and returns true.
 	 */
 	bool jackknife(const K& Xkey, T& mu_X, T& sigma_X);
 
 	/**
 	 * Returns a copy of the jackknife samples of the variable with key Xkey.
+	 * Throws if Xkey does not exist.
 	 */
 	std::vector<T> samples(const K& Xkey);
 
