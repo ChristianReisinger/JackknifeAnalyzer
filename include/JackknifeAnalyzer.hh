@@ -1,15 +1,12 @@
-/*
- * JackknifeAnalyzer.hh
- *
- *  Created on: 22.02.2019
- *      Author: reisinger
- */
-
 #ifndef INCLUDE_JACKKNIFEANALYZER_HH_
 #define INCLUDE_JACKKNIFEANALYZER_HH_
 
 #include <map>
 #include <vector>
+
+namespace de_uni_frankfurt_itp {
+namespace reisinger {
+namespace jackknife_analyzer_0219 {
 
 template<typename K, typename T>
 class JackknifeAnalyzer {
@@ -112,6 +109,10 @@ private:
 	std::map<K, T> Xs_mu;
 
 };
+
+}
+}
+}
 
 #include <detail/JackknifeAnalyzer.tcc>
 

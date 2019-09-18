@@ -16,6 +16,10 @@
 #include <helper_functions.hh>
 #include <JackknifeAnalyzer.hh>
 
+namespace de_uni_frankfurt_itp {
+namespace reisinger {
+namespace jackknife_analyzer_0219 {
+
 template<typename K, typename T>
 JackknifeAnalyzer<K, T>::JackknifeAnalyzer() {
 	init();
@@ -167,4 +171,8 @@ bool JackknifeAnalyzer<K, T>::verify_X(const K& Xkey, const std::vector<T>& Xsam
 		throw std::runtime_error("trying to add dataset with different number of samples than already existing ones.");
 
 	return true;
+}
+
+}
+}
 }
