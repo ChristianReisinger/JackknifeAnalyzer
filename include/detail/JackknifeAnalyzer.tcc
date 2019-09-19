@@ -74,7 +74,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const std:
 template<typename K, typename T>
 template<typename Function, typename ... Ks>
 void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const Ks& ... F_arg_keys) {
-	static_assert(and_type<std::is_convertible<Ks, K>::value ...>::value,
+	static_assert(tools::helper::and_type<std::is_convertible<Ks, K>::value ...>::value,
 			"JackknifeAnalyzer::add_function invalid key type");
 	static_assert(std::is_convertible<Function, std::function<T(decltype(Xs_mu[F_arg_keys])...)> >::value,
 			"JackknifeAnalyzer::add_function invalid function");
