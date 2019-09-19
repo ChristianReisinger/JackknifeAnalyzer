@@ -1,10 +1,3 @@
-/*
- * JackknifeAnalyzer.tcc
- *
- *  Created on: 22.02.2019
- *      Author: reisinger
- */
-
 #include <map>
 #include <vector>
 #include <utility>
