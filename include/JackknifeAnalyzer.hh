@@ -73,35 +73,35 @@ public:
 	/**
 	 * Returns a vector of keys of all variables in the JackknifeAnalyzer.
 	 */
-	std::vector<K> keys();
+	std::vector<K> keys() const;
 
 	/**
 	 * Returns the mean of the variable with key Xkey.
 	 * Throws if Xkey does not exist.
 	 */
-	double mu(const K& Xkey);
+	double mu(const K& Xkey) const;
 
 	/**
 	 * Returns the jackknife error of the variable with key Xkey.
 	 * Throws if Xkey does not exist.
 	 */
-	double sigma(const K& Xkey);
+	double sigma(const K& Xkey) const;
 
 	/**
 	 * If a key Xkey does not exist, does nothing and returns false, otherwise
 	 * assigns the mean / jackknife error of the variable with key Xkey to mu_X / sigma_X and returns true.
 	 */
-	bool jackknife(const K& Xkey, T& mu_X, T& sigma_X);
+	bool jackknife(const K& Xkey, T& mu_X, T& sigma_X) const;
 
 	/**
 	 * Returns a copy of the jackknife samples of the variable with key Xkey.
 	 * Throws if Xkey does not exist.
 	 */
-	std::vector<T> samples(const K& Xkey);
+	std::vector<T> samples(const K& Xkey) const;
 
 private:
 
-	int N_samples;
+	size_t N_samples;
 	void init();
 	bool verify_X(const K& Xkey, const std::vector<T>& Xsamples);
 

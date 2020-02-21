@@ -83,7 +83,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const Ks& 
 		Xs_mu[Fkey] = F(Xs_mu.at(F_arg_keys)...);
 
 		std::vector<T> F_jackknife_samples;
-		for (int i = 0; i < N_samples; ++i)
+		for (size_t i = 0; i < N_samples; ++i)
 			F_jackknife_samples.push_back(F(Xs_reduced_samples.at(F_arg_keys).at(i)...));
 		Xs_reduced_samples[Fkey] = F_jackknife_samples;
 	}
@@ -96,33 +96,33 @@ void JackknifeAnalyzer<K, T>::remove(const K& Xkey) {
 }
 
 template<typename K, typename T>
-std::vector<K> JackknifeAnalyzer<K, T>::keys() {
+std::vector<K> JackknifeAnalyzer<K, T>::keys() const {
 	std::vector<K> ks;
-	for (auto& key_mu : Xs_mu)
+	for (const auto& key_mu : Xs_mu)
 		ks.push_back(key_mu.first);
 	return ks;
 }
 
 template<typename K, typename T>
-double JackknifeAnalyzer<K, T>::mu(const K& Xkey) {
+double JackknifeAnalyzer<K, T>::mu(const K& Xkey) const {
 	return Xs_mu.at(Xkey);
 }
 
 template<typename K, typename T>
-double JackknifeAnalyzer<K, T>::sigma(const K& Xkey) {
+double JackknifeAnalyzer<K, T>::sigma(const K& Xkey) const {
 	double sigma = 0.0;
-	for (T d : Xs_reduced_samples.at(Xkey))
+	for (const T& d : Xs_reduced_samples.at(Xkey))
 		sigma += pow(d - Xs_mu.at(Xkey), (T) 2);
 	return sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma);
 }
 
 template<typename K, typename T>
-bool JackknifeAnalyzer<K, T>::jackknife(const K& Xkey, T& mu_X, T& sigma_X) {
+bool JackknifeAnalyzer<K, T>::jackknife(const K& Xkey, T& mu_X, T& sigma_X) const {
 	if (Xs_reduced_samples.count(Xkey) && Xs_mu.count(Xkey)) {
-		mu_X = Xs_mu[Xkey];
+		mu_X = Xs_mu.at(Xkey);
 
 		sigma_X = 0;
-		for (T d : Xs_reduced_samples[Xkey])
+		for (const T& d : Xs_reduced_samples.at(Xkey))
 			sigma_X += pow(d - mu_X, (T) 2);
 		sigma_X = sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma_X);
 		return true;
@@ -131,7 +131,7 @@ bool JackknifeAnalyzer<K, T>::jackknife(const K& Xkey, T& mu_X, T& sigma_X) {
 }
 
 template<typename K, typename T>
-std::vector<T> JackknifeAnalyzer<K, T>::samples(const K& Xkey) {
+std::vector<T> JackknifeAnalyzer<K, T>::samples(const K& Xkey) const {
 	return Xs_reduced_samples.at(Xkey);
 }
 
