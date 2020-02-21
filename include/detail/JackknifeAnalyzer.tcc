@@ -80,7 +80,8 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const Ks& 
 			"JackknifeAnalyzer::add_function invalid function");
 
 	if (Xs_reduced_samples.count(Fkey) == 0 && Xs_mu.count(Fkey) == 0) {
-		Xs_mu[Fkey] = F(Xs_mu.at(F_arg_keys)...);
+		const T F_mu = F(Xs_mu.at(F_arg_keys)...); // before [] to be exception safe
+		Xs_mu[Fkey] = F_mu;
 
 		std::vector<T> F_jackknife_samples;
 		for (size_t i = 0; i < N_samples; ++i)
