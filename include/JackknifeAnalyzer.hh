@@ -101,7 +101,7 @@ public:
 
 private:
 
-	size_t N_samples;
+	std::size_t N_samples;
 	void init();
 	bool verify_X(const K& Xkey, const std::vector<T>& Xsamples);
 

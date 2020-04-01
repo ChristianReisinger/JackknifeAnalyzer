@@ -61,7 +61,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const std:
 		Xs_mu[Fkey] = F(args_mu);
 
 		std::vector<T> F_jackknife_samples;
-		for (size_t i = 0; i < N_samples; ++i) {
+		for (std::size_t i = 0; i < N_samples; ++i) {
 			std::vector<T> args_red_samples;
 			for (const K& key : F_arg_keys)
 				args_red_samples.push_back(Xs_reduced_samples.at(key).at(i));
@@ -84,7 +84,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const Ks& 
 		Xs_mu[Fkey] = F_mu;
 
 		std::vector<T> F_jackknife_samples;
-		for (size_t i = 0; i < N_samples; ++i)
+		for (std::size_t i = 0; i < N_samples; ++i)
 			F_jackknife_samples.push_back(F(Xs_reduced_samples.at(F_arg_keys).at(i)...));
 		Xs_reduced_samples[Fkey] = F_jackknife_samples;
 	}
