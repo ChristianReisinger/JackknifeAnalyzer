@@ -105,12 +105,12 @@ std::vector<K> JackknifeAnalyzer<K, T>::keys() const {
 }
 
 template<typename K, typename T>
-double JackknifeAnalyzer<K, T>::mu(const K& Xkey) const {
+T JackknifeAnalyzer<K, T>::mu(const K& Xkey) const {
 	return Xs_mu.at(Xkey);
 }
 
 template<typename K, typename T>
-double JackknifeAnalyzer<K, T>::sigma(const K& Xkey) const {
+T JackknifeAnalyzer<K, T>::sigma(const K& Xkey) const {
 	double sigma = 0.0;
 	for (const T& d : Xs_reduced_samples.at(Xkey))
 		sigma += pow(d - Xs_mu.at(Xkey), (T) 2);

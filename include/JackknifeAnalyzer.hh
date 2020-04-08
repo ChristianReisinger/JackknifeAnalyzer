@@ -47,7 +47,7 @@ public:
 	 * Does nothing if key Fkey already exists.
 	 * Throws if Fkey and one or more keys in F_arg_keys do not exist.
 	 *
-	 * This version of add_function can be used if the number of arguments of F is unknown at compile time, but
+	 * This overload can be used if the number of arguments of F is unknown at compile time, but
 	 * requires vector input for the keys and function arguments.
 	 */
 	template<typename Function>
@@ -59,7 +59,8 @@ public:
 	 * Does nothing if key Fkey already exists.
 	 * Throws if Fkey and one or more keys F_arg_keys do not exist.
 	 *
-	 * Accepts a function F taking any number of arguments of data type T, which requires knowing the number of arguments at compile time.
+	 * Accepts a function F taking any number of arguments of data type T, which requires knowing the number of arguments
+	 * at compile time.
 	 */
 	template<typename Function, typename ... Ks>
 	void add_function(const K& Fkey, Function F, const Ks& ... F_arg_keys);
@@ -79,13 +80,13 @@ public:
 	 * Returns the mean of the variable with key Xkey.
 	 * Throws if Xkey does not exist.
 	 */
-	double mu(const K& Xkey) const;
+	T mu(const K& Xkey) const;
 
 	/**
 	 * Returns the jackknife error of the variable with key Xkey.
 	 * Throws if Xkey does not exist.
 	 */
-	double sigma(const K& Xkey) const;
+	T sigma(const K& Xkey) const;
 
 	/**
 	 * If a key Xkey does not exist, does nothing and returns false, otherwise
