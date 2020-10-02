@@ -15,7 +15,7 @@ namespace jackknife_analyzer_0219 {
 
 template<typename K, typename T>
 JackknifeAnalyzer<K, T>::JackknifeAnalyzer(std::size_t bin_size) :
-		N_samples { 0 }, bin_size { bin_size } {
+		N_bins { 0 }, bin_size { bin_size } {
 
 	static_assert(std::is_arithmetic<T>::value, "JackknifeAnalyzer data type is not arithmetic");
 }
@@ -47,9 +47,9 @@ void JackknifeAnalyzer<K, T>::resample(const K& Xkey, const std::vector<T>& Xsam
 		Xs_mu[Xkey] = sum_samples / static_cast<T>(Xsamples.size());
 
 		std::vector<T> red_samples;
-		red_samples.reserve(N_samples);
+		red_samples.reserve(N_bins);
 
-		for (std::size_t b = 0; b < N_samples; ++b) {
+		for (std::size_t b = 0; b < N_bins; ++b) {
 			T red_sample = sum_samples;
 			const auto next_bin_first_sample = (b + 1) * bin_size;
 			for (std::size_t i = b * bin_size; i < next_bin_first_sample; ++i)
@@ -75,7 +75,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const std:
 		Xs_mu[Fkey] = F(args_mu);
 
 		std::vector<T> F_jackknife_samples;
-		for (std::size_t i = 0; i < N_samples; ++i) {
+		for (std::size_t i = 0; i < N_bins; ++i) {
 			std::vector<T> args_red_samples;
 			for (const K& key : F_arg_keys)
 				args_red_samples.push_back(Xs_reduced_samples.at(key).at(i));
@@ -98,7 +98,7 @@ void JackknifeAnalyzer<K, T>::add_function(const K& Fkey, Function F, const Ks& 
 		Xs_mu[Fkey] = F_mu;
 
 		std::vector<T> F_jackknife_samples;
-		for (std::size_t i = 0; i < N_samples; ++i)
+		for (std::size_t i = 0; i < N_bins; ++i)
 			F_jackknife_samples.push_back(F(Xs_reduced_samples.at(F_arg_keys).at(i)...));
 		Xs_reduced_samples[Fkey] = F_jackknife_samples;
 	}
@@ -128,7 +128,7 @@ T JackknifeAnalyzer<K, T>::sigma(const K& Xkey) const {
 	double sigma = 0.0;
 	for (const T& d : Xs_reduced_samples.at(Xkey))
 		sigma += pow(d - Xs_mu.at(Xkey), (T) 2);
-	return sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma);
+	return sqrt((((T) (N_bins - 1)) / ((T) N_bins)) * sigma);
 }
 
 template<typename K, typename T>
@@ -139,7 +139,7 @@ bool JackknifeAnalyzer<K, T>::jackknife(const K& Xkey, T& mu_X, T& sigma_X) cons
 		sigma_X = 0;
 		for (const T& d : Xs_reduced_samples.at(Xkey))
 			sigma_X += pow(d - mu_X, (T) 2);
-		sigma_X = sqrt((((T) (N_samples - 1)) / ((T) N_samples)) * sigma_X);
+		sigma_X = sqrt((((T) (N_bins - 1)) / ((T) N_bins)) * sigma_X);
 		return true;
 	} else
 		return false;
@@ -156,12 +156,12 @@ template<typename K, typename T>
 bool JackknifeAnalyzer<K, T>::init_or_verify_N(const std::vector<T>& Xsamples, bool binned) {
 	const auto num_bins = Xsamples.size() / (binned ? 1 : bin_size);
 
-	if (N_samples == 0) {
+	if (N_bins == 0) {
 		if (num_bins > 1)
-			N_samples = num_bins;
+			N_bins = num_bins;
 		else
 			throw std::runtime_error("trying to add dataset with less than 2 bins.");
-	} else if (num_bins != N_samples)
+	} else if (num_bins != N_bins)
 		throw std::runtime_error("trying to add dataset with different number of bins than already existing ones.");
 
 	return true;

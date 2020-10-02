@@ -102,7 +102,7 @@ public:
 
 private:
 
-	std::size_t N_samples;
+	std::size_t N_bins;
 	const std::size_t bin_size;
 	void init();
 	bool init_or_verify_N(const std::vector<T>& Xsamples, bool binned);
