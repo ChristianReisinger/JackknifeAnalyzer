@@ -18,14 +18,14 @@ public:
 	 * Jackknife samples and means are stored internally using keys of type K.
 	 * Mean and jackknife error of a stored variable can be computed by calling jackknife(...), mu(...), sigma(...) with according key.
 	 */
-	JackknifeAnalyzer();
+	JackknifeAnalyzer(std::size_t bin_size = 1);
 
 	/**
 	 * Same as calling
 	 * JackknifeAnalyzer();
 	 * resample(Xkey, Xsamples);
 	 */
-	JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples);
+	JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_size = 1);
 
 	/**
 	 * Store the given jackknife samples of X under the key Xkey for use in further computations.
@@ -103,8 +103,9 @@ public:
 private:
 
 	std::size_t N_samples;
+	const std::size_t bin_size;
 	void init();
-	bool verify_X(const K& Xkey, const std::vector<T>& Xsamples);
+	bool init_or_verify_N(const std::vector<T>& Xsamples, bool binned);
 
 	std::map<K, std::vector<T> > Xs_reduced_samples;
 	std::map<K, T> Xs_mu;

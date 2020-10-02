@@ -14,19 +14,23 @@ namespace reisinger {
 namespace jackknife_analyzer_0219 {
 
 template<typename K, typename T>
-JackknifeAnalyzer<K, T>::JackknifeAnalyzer() {
-	init();
+JackknifeAnalyzer<K, T>::JackknifeAnalyzer(std::size_t bin_size) :
+		N_samples { 0 }, bin_size { bin_size } {
+
+	static_assert(std::is_arithmetic<T>::value, "JackknifeAnalyzer data type is not arithmetic");
 }
 
 template<typename K, typename T>
-JackknifeAnalyzer<K, T>::JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples) {
-	init();
+JackknifeAnalyzer<K, T>::JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_size) :
+		JackknifeAnalyzer<K, T> { bin_size } {
 	resample(Xkey, Xsamples);
 }
 
 template<typename K, typename T>
 void JackknifeAnalyzer<K, T>::add_resampled(const K& Xkey, const std::vector<T>& Xjackknife_samples, const T& mu_X) {
-	if (verify_X(Xkey, Xjackknife_samples)) {
+	if (Xs_reduced_samples.count(Xkey) == 0 && Xs_mu.count(Xkey) == 0) {
+		init_or_verify_N(Xjackknife_samples, true);
+
 		Xs_reduced_samples[Xkey] = Xjackknife_samples;
 		Xs_mu[Xkey] = mu_X;
 	}
@@ -34,15 +38,25 @@ void JackknifeAnalyzer<K, T>::add_resampled(const K& Xkey, const std::vector<T>&
 
 template<typename K, typename T>
 void JackknifeAnalyzer<K, T>::resample(const K& Xkey, const std::vector<T>& Xsamples) {
-	if (verify_X(Xkey, Xsamples)) {
+	if (Xs_reduced_samples.count(Xkey) == 0 && Xs_mu.count(Xkey) == 0) {
+		init_or_verify_N(Xsamples, false);
+
 		T sum_samples = 0;
 		for (T d : Xsamples)
 			sum_samples += d;
-		Xs_mu[Xkey] = sum_samples / (T) N_samples;
+		Xs_mu[Xkey] = sum_samples / static_cast<T>(Xsamples.size());
 
 		std::vector<T> red_samples;
-		for (T d : Xsamples)
-			red_samples.push_back((sum_samples - d) / (T) (N_samples - 1));
+		red_samples.reserve(N_samples);
+
+		for (std::size_t b = 0; b < N_samples; ++b) {
+			T red_sample = sum_samples;
+			const auto next_bin_first_sample = (b + 1) * bin_size;
+			for (std::size_t i = b * bin_size; i < next_bin_first_sample; ++i)
+				red_sample -= Xsamples[i];
+
+			red_samples.push_back(red_sample / static_cast<T>(Xsamples.size() - bin_size));
+		}
 
 		Xs_reduced_samples[Xkey] = red_samples;
 	}
@@ -138,31 +152,17 @@ std::vector<T> JackknifeAnalyzer<K, T>::samples(const K& Xkey) const {
 
 // ************************************** private **************************************
 
-/**
- * initialize
- */
 template<typename K, typename T>
-void JackknifeAnalyzer<K, T>::init() {
-	static_assert(std::is_arithmetic<T>::value, "JackknifeAnalyzer data type is not arithmetic");
-	N_samples = 0;
-}
-
-/**
- * Ensure equal and > 1 number of samples for all variables, otherwise an exception is thrown.
- * Return true if number of samples is equal to existing data and data with the key Xkey does not exist, false otherwise.
- */
-template<typename K, typename T>
-bool JackknifeAnalyzer<K, T>::verify_X(const K& Xkey, const std::vector<T>& Xsamples) {
-	if (Xs_reduced_samples.count(Xkey) || Xs_mu.count(Xkey))
-		return false;
+bool JackknifeAnalyzer<K, T>::init_or_verify_N(const std::vector<T>& Xsamples, bool binned) {
+	const auto num_bins = Xsamples.size() / (binned ? 1 : bin_size);
 
 	if (N_samples == 0) {
-		if (Xsamples.size() > 1)
-			N_samples = Xsamples.size();
+		if (num_bins > 1)
+			N_samples = num_bins;
 		else
-			throw std::runtime_error("trying to add dataset with less than 2 samples.");
-	} else if (Xsamples.size() != N_samples)
-		throw std::runtime_error("trying to add dataset with different number of samples than already existing ones.");
+			throw std::runtime_error("trying to add dataset with less than 2 bins.");
+	} else if (num_bins != N_samples)
+		throw std::runtime_error("trying to add dataset with different number of bins than already existing ones.");
 
 	return true;
 }
