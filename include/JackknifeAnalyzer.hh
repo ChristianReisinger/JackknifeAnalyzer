@@ -17,15 +17,16 @@ public:
 	 * Jackknife-resampled datasets can be added directly or computed from non-resampled datasets or a function.
 	 * Jackknife samples and means are stored internally using keys of type K.
 	 * Mean and jackknife error of a stored variable can be computed by calling jackknife(...), mu(...), sigma(...) with according key.
+	 * @param	bin_omit_point_num number of points to omit when resampling. Default: 1. Use values > 1 for binning.
 	 */
-	JackknifeAnalyzer(std::size_t bin_size = 1);
+	JackknifeAnalyzer(std::size_t bin_omit_point_num = 1);
 
 	/**
 	 * Same as calling
 	 * JackknifeAnalyzer();
 	 * resample(Xkey, Xsamples);
 	 */
-	JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_size = 1);
+	JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_omit_point_num = 1);
 
 	/**
 	 * Store the given jackknife samples of X under the key Xkey for use in further computations.
@@ -103,7 +104,7 @@ public:
 private:
 
 	std::size_t N_bins;
-	const std::size_t bin_size;
+	const std::size_t bin_omit_point_num;
 	void init();
 	bool init_or_verify_N(const std::vector<T>& Xsamples, bool binned);
 
