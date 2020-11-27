@@ -14,15 +14,15 @@ namespace reisinger {
 namespace jackknife_analyzer_0219 {
 
 template<typename K, typename T>
-JackknifeAnalyzer<K, T>::JackknifeAnalyzer(std::size_t bin_omit_point_num) :
-		N_bins { 0 }, bin_omit_point_num { bin_omit_point_num } {
+JackknifeAnalyzer<K, T>::JackknifeAnalyzer(std::size_t bin_size) :
+		N_bins { 0 }, bin_size { bin_size } {
 
 	static_assert(std::is_arithmetic<T>::value, "JackknifeAnalyzer data type is not arithmetic");
 }
 
 template<typename K, typename T>
-JackknifeAnalyzer<K, T>::JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_omit_point_num) :
-		JackknifeAnalyzer<K, T> { bin_omit_point_num } {
+JackknifeAnalyzer<K, T>::JackknifeAnalyzer(const K& Xkey, const std::vector<T>& Xsamples, std::size_t bin_size) :
+		JackknifeAnalyzer<K, T> { bin_size } {
 	resample(Xkey, Xsamples);
 }
 
@@ -51,11 +51,11 @@ void JackknifeAnalyzer<K, T>::resample(const K& Xkey, const std::vector<T>& Xsam
 
 		for (std::size_t b = 0; b < N_bins; ++b) {
 			T red_sample = sum_samples;
-			const auto next_bin_first_sample = (b + 1) * bin_omit_point_num;
-			for (std::size_t i = b * bin_omit_point_num; i < next_bin_first_sample; ++i)
+			const auto next_bin_first_sample = (b + 1) * bin_size;
+			for (std::size_t i = b * bin_size; i < next_bin_first_sample; ++i)
 				red_sample -= Xsamples[i];
 
-			red_samples.push_back(red_sample / static_cast<T>(Xsamples.size() - bin_omit_point_num));
+			red_samples.push_back(red_sample / static_cast<T>(Xsamples.size() - bin_size));
 		}
 
 		Xs_reduced_samples[Xkey] = red_samples;
@@ -154,7 +154,7 @@ std::vector<T> JackknifeAnalyzer<K, T>::samples(const K& Xkey) const {
 
 template<typename K, typename T>
 bool JackknifeAnalyzer<K, T>::init_or_verify_N(const std::vector<T>& Xsamples, bool binned) {
-	const auto num_bins = Xsamples.size() / (binned ? 1 : bin_omit_point_num);
+	const auto num_bins = Xsamples.size() / (binned ? 1 : bin_size);
 
 	if (N_bins == 0) {
 		if (num_bins > 1)
